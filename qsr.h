@@ -11,8 +11,8 @@ typedef struct QRS_params
    double NPKF; 
    double THRESHOLD1;
    double THRESHOLD2;
-   // Add parameters that are missing
-   // or of use to you
+   int f1_x[11];
+   int f1_y[2];
    
 } QRS_params;
 

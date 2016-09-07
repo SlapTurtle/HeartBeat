@@ -8,27 +8,33 @@
 // The functions and object predefined are just for inspiration.
 // Please change order,names arguments to fit your solution.
 
-int main()
-{
-    QRS_params qsr_params;       // Instance of the made available through: #include "qsr.h"
- FILE *file;                  // Pointer to a file object
- file = openfile("ECG.txt");
+int main() {
+    QRS_params qrsP;       		// Instance of the made available through: #include "qsr.h"
+    FILE *file;                 // Pointer to a file object
+ 	file = openfile("ECG.txt");
 
- int i,j;
+ 	int i;
+ 	for(int j = 0; j<11; j++) {
+ 		qrsP.f1_x[j] = 0;
+ 	}
+ 	for(int j = 0; j<2; j++) {
+ 	 		qrsP.f1_y[j] = 0;
+ 	}
 
-    i = getNextData(file);          // Read Data from Sensor
-    j = getNextData(file);
 
-    printf("%i\n", i);
-    printf("%i\n", j);
+ 	for(int j = 0; j < 24; j++){
+ 		printf("ID: %i - ", j);
+ 		i = getNextData(file);          // Read Data from Sensor
+ 		printf("in: %i - ", i);
+ 		i = lowPassFilter(i, qrsP);
+ 		printf("low: %i \n", i);
+ 	}
+             // Filter Data
 
-    /*
-    lowPassFilter();            // Filter Data
-
-    peakDetection(&qsr_params); // Perform Peak Detection
+    /*peakDetection(&qsr_params); // Perform Peak Detection
 
     closefile(file);
     */
 
- return 0;
+    return 0;
 }

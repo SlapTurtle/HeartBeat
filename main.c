@@ -4,21 +4,31 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// Main function for organizing the program execution.
+// Main function for organising the program execution.
 // The functions and object predefined are just for inspiration.
-// Please change orden,names arguments to fit your solution.
+// Please change order,names arguments to fit your solution.
 
 int main()
-{	
-    QRS_params qsr_params;       // Instance of the made avaiable through: #include "qsr.h"
-	FILE *file;                  // Pointer to a file object
-	file = openfile("ECG.txt");
+{
+    QRS_params qsr_params;       // Instance of the made available through: #include "qsr.h"
+ FILE *file;                  // Pointer to a file object
+ file = openfile("ECG.txt");
 
-    getNextData(file);          // Read Data from Sensor
-                                
+ int i,j;
+
+    i = getNextData(file);          // Read Data from Sensor
+    j = getNextData(file);
+
+    printf("%i\n", i);
+    printf("%i\n", j);
+
+    /*
     lowPassFilter();            // Filter Data
-                                
+
     peakDetection(&qsr_params); // Perform Peak Detection
 
-	return 0;
+    closefile(file);
+    */
+
+ return 0;
 }

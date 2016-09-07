@@ -4,12 +4,17 @@
 
 int getNextData(FILE *file)
 {
-   return 0; // return sensor value
+ int input;
+ fscanf(file, "%i", &input);
+ return input;
 }
 
-FILE* openfile(const char* filename)
-{
-   FILE *file = NULL; // Replace NULL with the actual file object
+FILE* openfile(const char* filename) {
+   FILE *file = fopen("ECG.txt","r");
 
    return file;
+}
+
+void closefile(FILE *file){
+ fclose(file);
 }

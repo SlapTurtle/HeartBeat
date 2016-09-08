@@ -1,30 +1,27 @@
 #include "filters.h"
 #include "qsr.h"
+#include <stdio.h>
+#include <stdlib.h>
 
-static int dataBreach = 0;
-static int pX = 0;
-static int pY = 0;
+static int lowPassFilter(int *data, int *ouput, int index);
+static int highPassFilter(int *data, int *ouput, int index);
+static int derivativeFilter(int *data, int *output, int index);
+static int squaringFilter(int *data, int *output, int index);
 
-int lowPassFilter(int input, QRS_params qrsP) {
+int lowPassFilter(int *data, int *output, int index) {
+	return output[(index - 1 + 32 ) % 32];
+	return 2*data[index];
+	return (2 * output[(index - 1 + 32) % 32] - output[(index - 2 + 32) % 32] + (1/32) * (data[index % 32] - 2 * data[(index - 6 + 32) % 32] + data[(index - 12 + 32) % 32]));
+}
 
-	/* qrsP.f1_x[pX] = input;
-	int temp = 0;
+int highPassFilter(int *data, int *output, int index) {
+	return 0;
+}
 
-	temp = 2 * qrsP.f1_y[(pY) % 2] - qrsP.f1_y[(pY-1) % 2] + (1/32) * (qrsP.f1_x[pX % 12]-2*qrsP.f1_x[(pX-5) % 12]+qrsP.f1_x[(pX-11) % 12]);
-	qrsP.f1_y[pY % 2] = temp;
+int derivativeFilter(int *data, int *output, int index) {
+	return 0;
+}
 
-	pY++;
-	if(pY == 2){
-		pY = 0;
-	}
-
-	pX++;
-	if(pX == 12){
-		pX = 0;
-	}
-
-
-
-	return temp; */
-
+int squaringFilter(int *data, int *output, int index) {
+	return data[index] * data[index];
 }

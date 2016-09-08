@@ -11,8 +11,14 @@ typedef struct QRS_params
    double NPKF; 
    double THRESHOLD1;
    double THRESHOLD2;
-   int f1_x[11];
-   int f1_y[2];
+   const int LOWCycle;
+   const int HIGHCycle;
+   const int DERCycle;
+   int DATA_RAW[32];
+   int DATA_LOW[32];
+   int DATA_HIGH[32];
+   int DATA_DER[32];
+   int DATA_SQR[32];
    
 } QRS_params;
 

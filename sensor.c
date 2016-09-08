@@ -2,11 +2,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int getNextData(FILE *file)
-{
- int input;
- fscanf(file, "%i", &input);
- return input;
+static int getNextData(FILE *file);
+static FILE* openfile(const char* filename);
+static void closefile(FILE *file);
+
+int getNextData(FILE *file) {
+	int input;
+	fscanf(file, "%i", &input);
+	return input;
 }
 
 FILE* openfile(const char* filename) {
@@ -16,5 +19,5 @@ FILE* openfile(const char* filename) {
 }
 
 void closefile(FILE *file){
- fclose(file);
+	fclose(file);
 }

@@ -25,9 +25,15 @@ typedef struct QRS_params
    int DATA_DER[DERC];
    int DATA_SQR[SQRC];
    int DATA_MWI[MWI];
+   int DATA_PEAKS[MWI];
+   int DATA_PEAKSTIME[MWI];
+   int DATA_TIMEMS;
+   int peakcount;
    
 } QRS_params;
 
 void peakDetection(QRS_params *params);
+int isPeak(QRS_params *params, int index);
+double SPKF(QRS_params *params);
 
 #endif //QSR_H

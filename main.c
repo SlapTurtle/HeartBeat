@@ -39,6 +39,13 @@ int main() {
 				qrsP.DATA_MWI[i*LOWC + j] = MoveWindowsIntegration(ptr, i*LOWC + j);
 			}
 
+			if (i > 4 && isPeak(ptr, i*LOWC + j) == 1) {
+				qrsP.SPKF = SPKF(ptr);
+				printf("[PEAK] [%f]\n", qrsP.SPKF);
+			} else {
+				printf("\n");
+			}
+
 			printf("cycle: %i - ", i);
 			printf("index: %i - ", j);
 			printf("raw: %i - ", qrsP.DATA_RAW[j % qrsP.RAWCycle]);
@@ -46,8 +53,10 @@ int main() {
 			printf("high: %i - ", qrsP.DATA_HIGH[j % qrsP.HIGHCycle]);
 			printf("der: %i - ", qrsP.DATA_DER[j % qrsP.DERCycle]);
 			printf("sqr: %i - ", qrsP.DATA_SQR[j % qrsP.SQRCycle]);
-			printf("mwi: %i", qrsP.DATA_MWI[i*LOWC + j]);
-			printf("\n");
+			printf("mwi: %i - ", qrsP.DATA_MWI[i*LOWC + j]);
+			printf("time: %i ", qrsP.DATA_TIMEMS);
+
+			qrsP.DATA_TIMEMS+= 4;
 		}
  	}
 

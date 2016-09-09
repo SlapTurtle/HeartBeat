@@ -1,25 +1,18 @@
 #include "filters.h"
 #include "qsr.h"
-#include <stdio.h>
-#include <stdlib.h>
 
-static int lowPassFilter(int *data, int *ouput, int index);
-static int highPassFilter(int *data, int *ouput, int index);
-static int derivativeFilter(int *data, int *output, int index);
-static int squaringFilter(int *data, int *output, int index);
-
-int lowPassFilter(int *data, int *output, int index) {
-	return 2 * output[(index - 1 + 33) % 33] - output[(index - 2 + 33) % 33] + ( data[index % 13] - 2 * data[(index - 6 + 13) % 13] +  data[(index - 12 + 13) % 13] ) / 32 ;
+int lowPassFilter(QRS_params *qsrP, int index) {
+	return 2 * qsrP->DATA_LOW[(index - 1 + qsrP->LOWCycle) % qsrP->LOWCycle] - qsrP->DATA_LOW[(index - 2 + qsrP->LOWCycle) % qsrP->LOWCycle] + ( qsrP->DATA_RAW[index % qsrP->RAWCycle] - 2 * qsrP->DATA_RAW[(index - 6 + qsrP->RAWCycle) % qsrP->RAWCycle] +  qsrP->DATA_RAW[(index - 12 + qsrP->RAWCycle) % qsrP->RAWCycle] ) / 32;
 }
 
-int highPassFilter(int *data, int *output, int index) {
-	return output[(index - 1 + 5) % 5] - (data[index % 33] / 32) + data[(index - 16 + 33) % 33] - data[(index - 17 + 33) % 33] + ( data[(index - 32 + 33) % 33] / 32 );
+int highPassFilter(QRS_params *qsrP, int index) {
+	return qsrP->DATA_HIGH[(index - 1 + qsrP->HIGHCycle) % qsrP->HIGHCycle] - (qsrP->DATA_LOW[index % qsrP->LOWCycle] / 32) + qsrP->DATA_LOW[(index - 16 + qsrP->LOWCycle) % qsrP->LOWCycle] - qsrP->DATA_LOW[(index - 17 + qsrP->LOWCycle) % qsrP->LOWCycle] + ( qsrP->DATA_LOW[(index - 32 + qsrP->LOWCycle) % qsrP->LOWCycle] / 32 );
 }
 
-int derivativeFilter(int *data, int *output, int index) {
-	return ( 2 * data[index % 5] + data[(index - 1 + 5) % 5] - data[(index - 3 + 5) % 5] - 2 * data[(index - 4 + 5) % 5] ) / 8;
+int derivativeFilter(QRS_params *qsrP, int index) {
+	return ( 2 * qsrP->DATA_HIGH[index % qsrP->HIGHCycle] + qsrP->DATA_HIGH[(index - 1 + qsrP->HIGHCycle) % qsrP->HIGHCycle] - qsrP->DATA_HIGH[(index - 3 + qsrP->HIGHCycle) % qsrP->HIGHCycle] - 2 * qsrP->DATA_HIGH[(index - 4 + qsrP->HIGHCycle) % qsrP->HIGHCycle] ) / 8;
 }
 
-int squaringFilter(int *data, int *output, int index) {
-	return data[index % 1] * data[index % 1];
+int squaringFilter(QRS_params *qsrP, int index) {
+	return qsrP->DATA_DER[index % qsrP->DERCycle] * qsrP->DATA_DER[index % qsrP->DERCycle];
 }

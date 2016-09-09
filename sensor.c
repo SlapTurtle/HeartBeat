@@ -1,10 +1,4 @@
 #include "sensor.h"
-#include <stdio.h>
-#include <stdlib.h>
-
-static int getNextData(FILE *file);
-static FILE* openfile(const char* filename);
-static void closefile(FILE *file);
 
 int getNextData(FILE *file) {
 	int input;
@@ -12,12 +6,10 @@ int getNextData(FILE *file) {
 	return input;
 }
 
-FILE* openfile(const char* filename) {
-   FILE *file = fopen("ECG.txt","r");
-
-   return file;
+FILE* openFile(const char* filename) {
+   return fopen(filename,"r");
 }
 
-void closefile(FILE *file){
+void closeFile(FILE *file){
 	fclose(file);
 }

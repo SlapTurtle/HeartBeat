@@ -1,6 +1,11 @@
-#ifndef FITERS_H
-#define FITERS_H
+#include "qsr.h"
 
-//int lowPassFilter(int *data[], int *index);
+#ifndef FILTERS_H
+#define FILTERS_H
 
-#endif
+int lowPassFilter(QRS_params *qsrP, int index);
+int highPassFilter(QRS_params *qsrP, int index);
+int derivativeFilter(QRS_params *qsrP, int index);
+int squaringFilter(QRS_params *qsrP, int index);
+
+#endif //FILTERS_H

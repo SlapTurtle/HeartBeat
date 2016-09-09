@@ -1,3 +1,9 @@
+#define RAWC 13
+#define LOWC 33
+#define HIGHC 5
+#define DERC 1
+#define SQRC 9999
+
 #ifndef QSR_H
 #define QSR_H
 
@@ -12,14 +18,14 @@ typedef struct QRS_params
    const int HIGHCycle;
    const int DERCycle;
    const int SQRCycle;
-   int DATA_RAW[13];
-   int DATA_LOW[33];
-   int DATA_HIGH[5];
-   int DATA_DER[1];
-   int DATA_SQR[101];
+   int DATA_RAW[RAWC];
+   int DATA_LOW[LOWC];
+   int DATA_HIGH[HIGHC];
+   int DATA_DER[DERC];
+   int DATA_SQR[SQRC];
    
 } QRS_params;
 
 void peakDetection(QRS_params *params);
 
-#endif // QSR_H
+#endif //QSR_H

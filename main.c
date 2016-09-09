@@ -2,9 +2,10 @@
 #define LOWC 33
 #define HIGHC 5
 #define DERC 1
-#define SQRC 9999
+#define SQRC 31
+#define MWI 9999
 
-#define LOOPCOUNT 6
+#define LOOPCOUNT 30
 
 #include "sensor.h"
 #include "filters.h"
@@ -18,7 +19,7 @@ int main() {
     FILE *file = openFile("ECG.txt");
 
  	for(int i = 0; i < LOOPCOUNT; i++){
- 		for(int j = 0; j < 33; j++){
+ 		for(int j = 0; j < LOWC; j++){
 
 			qrsP.DATA_RAW[j % qrsP.RAWCycle] = getNextData(file);
 
@@ -34,6 +35,9 @@ int main() {
 			if(i > 3){
 				qrsP.DATA_SQR[j % qrsP.SQRCycle] = squaringFilter(ptr, j);
 			}
+			if(i > 4){
+				qrsP.DATA_MWI[i*LOWC + j] = MoveWindowsIntegration(ptr, i*LOWC + j);
+			}
 
 			printf("cycle: %i - ", i);
 			printf("index: %i - ", j);
@@ -41,7 +45,8 @@ int main() {
 			printf("low: %i - ", qrsP.DATA_LOW[j % qrsP.LOWCycle]);
 			printf("high: %i - ", qrsP.DATA_HIGH[j % qrsP.HIGHCycle]);
 			printf("der: %i - ", qrsP.DATA_DER[j % qrsP.DERCycle]);
-			printf("sqr: %i", qrsP.DATA_SQR[j % qrsP.SQRCycle]);
+			printf("sqr: %i - ", qrsP.DATA_SQR[j % qrsP.SQRCycle]);
+			printf("mwi: %i", qrsP.DATA_MWI[i*LOWC + j]);
 			printf("\n");
 		}
  	}

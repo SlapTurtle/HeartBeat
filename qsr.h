@@ -4,6 +4,7 @@
 #define DERC 1
 #define SQRC 31
 #define MWI 9999
+#define RR 8
 
 #ifndef QSR_H
 #define QSR_H
@@ -14,6 +15,8 @@ typedef struct QRS_params
    double NPKF; 
    double THRESHOLD1;
    double THRESHOLD2;
+   int RR_AVERAGE1[RR];
+   int RR_AVERAGE2[RR];
    const int RAWCycle;
    const int LOWCycle;
    const int HIGHCycle;

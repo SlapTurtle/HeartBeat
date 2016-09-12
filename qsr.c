@@ -24,7 +24,7 @@ double SPKF(QRS_params *params) {
 }
 
 double THRESHOLD1(QRS_params *params) {
-	return params->NPKF + 0.25 (params->SPKF - params->NPKF);
+	return params->NPKF + 0.25 * (params->SPKF - params->NPKF);
 }
 
 double THRESHOLD2(QRS_params *params) {

@@ -15,7 +15,7 @@
 #include <stdio.h>
 
 int main() {
-	QRS_params qrsP = {0, 0, 0, 0, 0, 0, RAWC, LOWC, HIGHC, DERC, SQRC, {0}, {0}, {0}, {0}, {0}};
+	QRS_params qrsP = {0, 0, 0, 0, 0, 0, 0, 0, 0, RAWC, LOWC, HIGHC, DERC, SQRC, {0}, {0}, {0}, {0}, {0}};
 	QRS_params *ptr = &qrsP;
 
 	// debug
@@ -68,17 +68,31 @@ int main() {
 				} else {
 					int peak = 0;
 					if (isPeak(ptr, i*LOWC + j) == 1) {
-						qrsP.SPKF = SPKF(ptr);
+						if (qrsP.DATA_PEAKS[qrsP.peakcount] > qrsP.THRESHOLD1) {
+							printf("%i > %f\n", qrsP.DATA_PEAKS[qrsP.peakcount], qrsP.THRESHOLD1);
+							CalculateRR(ptr);
+							qrsP.peakcount++;
+
+						} else {
+							qrsP.NPKF = NPKF(ptr);
+							qrsP.THRESHOLD1 = THRESHOLD1(ptr);
+							qrsP.THRESHOLD2 = THRESHOLD2(ptr);
+
+							printf("%f, %i %i", qrsP.NPKF, qrsP.THRESHOLD1, qrsP.THRESHOLD2);
+
+						}
+
+						//qrsP.SPKF = SPKF(ptr);
 						peak = 1;
 					}
-					int height = qrsP.DATA_MWI[i*LOWC + j] / 100;
+					int height = qrsP.DATA_MWI[i*LOWC + j] / 50;
 					if (height > 0) {
 						lastheight = height;
 						for (int y = 0; y < height; y++) {
 							printf(".");
 						}
 						if (peak == 1) {
-							printf("  [%4.2f, %i ms]", qrsP.SPKF, qrsP.DATA_TIMEMS);
+							printf("  [%4.2f, %i ms, avg: %i - %i]", qrsP.SPKF, qrsP.DATA_TIMEMS, qrsP.RR_AVERAGE1, qrsP.RR_AVERAGE2);
 						}
 						printf("\n");
 

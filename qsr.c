@@ -6,7 +6,7 @@ void peakDetection(QRS_params *params) {
 
 int isPeak(QRS_params *params, int index) {
 	int p = index - 1;
-	if (params->DATA_MWI[p-1] < params->DATA_MWI[p] && params->DATA_MWI[p+1] < params->DATA_MWI[p]) {
+	if (params->DATA_MWI[p-1] <= params->DATA_MWI[p] && params->DATA_MWI[p+1] < params->DATA_MWI[p]) {
 		params->DATA_PEAKS[params->peakcount] = params->DATA_MWI[p];
 		params->DATA_PEAKSTIME[params->peakcount] = params->DATA_TIMEMS;
 

@@ -22,6 +22,12 @@ typedef struct QRS_params
    const int HIGHCycle;
    const int DERCycle;
    const int SQRCycle;
+   int Index_Raw;
+   int Index_Low;
+   int Index_High;
+   int Index_Der;
+   int Index_Sqr;
+   int Index_Mwi;
    int DATA_RAW[RAWC];
    int DATA_LOW[LOWC];
    int DATA_HIGH[HIGHC];

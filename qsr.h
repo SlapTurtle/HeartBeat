@@ -3,7 +3,7 @@
 #define HIGHC 5
 #define DERC 1
 #define SQRC 31
-#define MWI 9999
+#define MWI 800
 #define RR 8
 
 #ifndef QSR_H

@@ -40,6 +40,7 @@ typedef struct QRS_params
 } QRS_params;
 
 void peakDetection(QRS_params *params);
+void result(QRS_params *params);
 int isPeak(QRS_params *params, int index);
 double SPKF(QRS_params *params);
 double NPKF(QRS_params *params);

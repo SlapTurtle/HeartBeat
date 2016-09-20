@@ -144,17 +144,13 @@ int main() {
 							if (qrsP.peakcount > 0) {
 								int RRpeak = qrsP.DATA_PEAKSTIME[qrsP.peakcount] - qrsP.DATA_PEAKSTIME[qrsP.LAST_RPEAK];
 								if (RRpeak > qrsP.RR_LOW-1 && RRpeak < qrsP.RR_HIGH+1) {
-									CalculateRR(ptr);
-									printf("Value: %i [%i ms since last peak]\n", qrsP.DATA_PEAKS[qrsP.peakcount], qrsP.DATA_PEAKSTIME[qrsP.peakcount]-qrsP.DATA_PEAKSTIME[qrsP.LAST_RPEAK]);
-									qrsP.LAST_RPEAK = qrsP.peakcount;
+									result(ptr);
 								} else {
 									if (RRpeak >= qrsP.RR_MISS) {
 										int backwards = qrsP.peakcount;
 										while (backwards >= 0) {
 											if (qrsP.DATA_PEAKS[backwards] > qrsP.THRESHOLD2) {
-												CalculateRR(ptr);
-												printf("Value: %i [%i ms since last peak]\n", qrsP.DATA_PEAKS[qrsP.peakcount], qrsP.DATA_PEAKSTIME[qrsP.peakcount]-qrsP.DATA_PEAKSTIME[qrsP.LAST_RPEAK]);
-												qrsP.LAST_RPEAK = qrsP.peakcount;
+												result(ptr);
 												break;
 											} else {
 												backwards--;

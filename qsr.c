@@ -71,6 +71,15 @@ void CalculateRR(QRS_params *params) {
 
 }
 
+void result(QRS_params *params) {
+	CalculateRR(params);
+	double dur = params->DATA_PEAKSTIME[params->peakcount]-params->DATA_PEAKSTIME[params->LAST_RPEAK];
+	double pulse = 60/(dur/1000);
+	if (pulse < 250) {
+		printf("Value: %i [heartrate: %.1f]\n", params->DATA_PEAKS[params->peakcount], pulse);
+		params->LAST_RPEAK = params->peakcount;
+	}
+}
 
 double SPKF(QRS_params *params) {
 	return 0.125 * params->DATA_PEAKS[params->peakcount] + 0.875 * params->SPKF;

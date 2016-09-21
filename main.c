@@ -5,7 +5,7 @@
 #define SQRC 31
 #define MWIC 3
 
-#define LOOPCOUNT 200*32
+#define LOOPCOUNT 10000
 
 #define DEBUGMODE 2
 

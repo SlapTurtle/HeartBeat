@@ -82,11 +82,16 @@ void CalculateRR(QRS_params *params) {
 
 void result(QRS_params *params) {
 	CalculateRR(params);
+	int peakValue = params->DATA_PEAKS[params->peakcount];
 	double time = params->DATA_PEAKSTIME[params->peakcount];
 	double dur = time - params->DATA_PEAKSTIME[params->LAST_RPEAK];
 	double pulse = 60/(dur/1000);
-	if (pulse < 250) {
-		printf("Peak Value: %i | Time: %.2f s | heartrate: %.1f\n", params->DATA_PEAKS[params->peakcount], time/1000, pulse);
+	char* warning = "";
+	if(peakValue < 2000){
+		warning = "[warning]";
+	}
+	if (pulse < 300) {
+		printf("Peak Value: %i | Time: %.2f s | heartrate: %.1f %s\n", peakValue, time/1000, pulse, warning);
 		params->LAST_RPEAK = params->peakcount;
 	}
 }

@@ -7,7 +7,7 @@ void peakDetection(QRS_params *params) {
 
 int isPeak(QRS_params *params, int index) {
 	int p = index - 1;
-	if (params->DATA_MWI[p-1] <= params->DATA_MWI[p] && params->DATA_MWI[p+1] < params->DATA_MWI[p]) {
+	if (params->DATA_MWI[p-1] < params->DATA_MWI[p] && params->DATA_MWI[p+1] < params->DATA_MWI[p]) {
 		params->DATA_PEAKS[params->peakcount] = params->DATA_MWI[p];
 		params->DATA_PEAKSTIME[params->peakcount] = params->DATA_TIMEMS;
 
@@ -71,12 +71,22 @@ void CalculateRR(QRS_params *params) {
 
 }
 
+/* char * getSpace(int max, char input[]){
+	int n = max - sizeof(input);
+	char *temp = (char*)malloc(n);
+	for(int i = 0; i<n; i++){
+		temp[i] = ' ';
+	}
+	return temp;
+ } */
+
 void result(QRS_params *params) {
 	CalculateRR(params);
-	double dur = params->DATA_PEAKSTIME[params->peakcount]-params->DATA_PEAKSTIME[params->LAST_RPEAK];
+	double time = params->DATA_PEAKSTIME[params->peakcount];
+	double dur = time - params->DATA_PEAKSTIME[params->LAST_RPEAK];
 	double pulse = 60/(dur/1000);
 	if (pulse < 250) {
-		printf("Value: %i [heartrate: %.1f]\n", params->DATA_PEAKS[params->peakcount], pulse);
+		printf("Peak Value: %i | Time: %.2f s | heartrate: %.1f\n", params->DATA_PEAKS[params->peakcount], time/1000, pulse);
 		params->LAST_RPEAK = params->peakcount;
 	}
 }
@@ -96,4 +106,3 @@ double THRESHOLD2(QRS_params *params) {
 double NPKF(QRS_params *params) {
 	return 0.125 * params->DATA_PEAKS[params->peakcount] + 0.875 * params->NPKF;
 }
-

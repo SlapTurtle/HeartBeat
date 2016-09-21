@@ -18,8 +18,8 @@ int isPeak(QRS_params *params, int index) {
 	}
 }
 
-void CalculateRR(QRS_params *params) {
-	if (params->peakcount < 1) {
+void CalculateRR(QRS_params *params, int c) {
+	if (c < 1) {
 		return;
 	}
 
@@ -29,15 +29,15 @@ void CalculateRR(QRS_params *params) {
 	int accum = 0;
 	int count = 0;
 
-	while (i <= params->peakcount - 1) {
+	while ((c - i) - i >= 0) {
 		if (i <= 7) {
-		accum+= params->DATA_PEAKSTIME[params->peakcount-i] - params->DATA_PEAKSTIME[params->peakcount-i-1];
+		accum+= params->DATA_PEAKSTIME[c-i] - params->DATA_PEAKSTIME[c-i-1];
 		count = i+1;
 		}
 
 		if (rr2count <= 7) {
-			if (params->DATA_PEAKS[params->peakcount-i] > params->THRESHOLD1) {
-				rr2accum += params->DATA_PEAKSTIME[params->peakcount-i] - params->DATA_PEAKSTIME[params->peakcount-i-1];
+			if (params->DATA_PEAKS[c-i] > params->THRESHOLD1) {
+				rr2accum += params->DATA_PEAKSTIME[c-i] - params->DATA_PEAKSTIME[c-i-1];
 				rr2count++;
 			}
 		} else {
@@ -48,12 +48,10 @@ void CalculateRR(QRS_params *params) {
 	}
 
 	if (count > 0) {
-		//printf("SETTING AVG1 TO %i \n", accum/count);
 		params->RR_AVERAGE1 = accum/count;
 	}
 
 	if (rr2count > 0) {
-		//printf("SETTING AVG2 TO %i \n", rr2accum/rr2count);
 		params->RR_AVERAGE2 = rr2accum/rr2count;
 	}
 
@@ -65,35 +63,29 @@ void CalculateRR(QRS_params *params) {
 
 	params->THRESHOLD1 = params->NPKF + 0.25 * (params->SPKF - params->NPKF);
 	params->THRESHOLD2 = 0.5 * params->THRESHOLD1;
-	//printf("SETTING THRESHOLDS TO %.2f and %.2f", params->THRESHOLD1, params->THRESHOLD2);
-	//printf("TRESHOLD1 IS NOW %i \n", params->THRESHOLD1);
-	//printf("TRESHOLD2 IS NOW %i \n", params->THRESHOLD2);
 
 }
 
-/* char * getSpace(int max, char input[]){
-	int n = max - sizeof(input);
-	char *temp = (char*)malloc(n);
-	for(int i = 0; i<n; i++){
-		temp[i] = ' ';
-	}
-	return temp;
- } */
-
-void result(QRS_params *params) {
-	CalculateRR(params);
-	int peakValue = params->DATA_PEAKS[params->peakcount];
-	double time = params->DATA_PEAKSTIME[params->peakcount];
+void result(QRS_params *params, int c) {
+	CalculateRR(params, c);
+	int peakValue = params->DATA_PEAKS[c];
+	double time = params->DATA_PEAKSTIME[c];
 	double dur = time - params->DATA_PEAKSTIME[params->LAST_RPEAK];
+
+	if (dur < 0) {
+		return;
+	}
+
 	double pulse = 60/(dur/1000);
 	char* warning = "";
 	if(peakValue < 2000){
 		warning = "[warning]";
 	}
-	if (pulse < 300) {
-		printf("Peak Value: %i | Time: %.2f s | heartrate: %.1f %s\n", peakValue, time/1000, pulse, warning);
-		params->LAST_RPEAK = params->peakcount;
+
+	if (pulse < 300) { // The decision to disregard certain peaks is clarified in the report
+		printf("Peak Value: %i | Time: %.2f s | heartrate: %.1f %s \n", peakValue, time/1000, pulse, warning);
 	}
+	params->LAST_RPEAK = params->peakcount;
 }
 
 double SPKF(QRS_params *params) {

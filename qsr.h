@@ -16,11 +16,11 @@ typedef struct QRS_params
    double NPKF; 
    double THRESHOLD1;
    double THRESHOLD2;
-   int RR_AVERAGE1;
-   int RR_AVERAGE2;
-   int RR_LOW;
-   int RR_HIGH;
-   int RR_MISS;
+   double RR_AVERAGE1;
+   double RR_AVERAGE2;
+   double RR_LOW;
+   double RR_HIGH;
+   double RR_MISS;
    int LAST_RPEAK;
    const int RAWCycle;
    const int LOWCycle;
@@ -48,12 +48,12 @@ typedef struct QRS_params
 } QRS_params;
 
 void peakDetection(QRS_params *params);
-void result(QRS_params *params);
+void result(QRS_params *params, int c);
 int isPeak(QRS_params *params, int index);
 double SPKF(QRS_params *params);
 double NPKF(QRS_params *params);
 double THRESHOLD1(QRS_params *params);
 double THRESHOLD2(QRS_params *params);
-void CalculateRR(QRS_params *params);
+void CalculateRR(QRS_params *params, int c);
 
 #endif //QSR_H

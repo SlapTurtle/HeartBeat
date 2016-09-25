@@ -4,7 +4,7 @@
 #define DERC 1
 #define SQRC 31
 #define MWIC 3
-#define PEAKC 9999
+#define PEAKC 250
 #define RR 8
 
 #ifndef QSR_H
@@ -28,12 +28,14 @@ typedef struct QRS_params
    const int DERCycle;
    const int SQRCycle;
    const int MWICycle;
+   const int PeakCyle;
    int Index_Raw;
    int Index_Low;
    int Index_High;
    int Index_Der;
    int Index_Sqr;
    int Index_Mwi;
+   int Index_Peak;
    int DATA_RAW[RAWC];
    int DATA_LOW[LOWC];
    int DATA_HIGH[HIGHC];

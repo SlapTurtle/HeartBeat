@@ -8,8 +8,8 @@ void peakDetection(QRS_params *params) {
 int isPeak(QRS_params *params, int index) {
 	int p = index - 1;
 	if (params->DATA_MWI[p-1] < params->DATA_MWI[p] && params->DATA_MWI[p+1] < params->DATA_MWI[p]) {
-		params->DATA_PEAKS[params->peakcount] = params->DATA_MWI[p];
-		params->DATA_PEAKSTIME[params->peakcount] = params->DATA_TIMEMS;
+		params->DATA_PEAKS[params->peakcount%PEAKC] = params->DATA_MWI[p];
+		params->DATA_PEAKSTIME[params->peakcount%PEAKC] = params->DATA_TIMEMS;
 
 		params->SPKF = SPKF(params);
 		return 1;
@@ -84,12 +84,12 @@ void result(QRS_params *params, int c) {
 
 	if (pulse < 300) { // The decision to disregard certain peaks is clarified in the report
 		printf("Peak Value: %i | Time: %.2f s | heartrate: %.1f %s \n", peakValue, time/1000, pulse, warning);
+		params->LAST_RPEAK = params->peakcount%PEAKC;
 	}
-	params->LAST_RPEAK = params->peakcount;
 }
 
 double SPKF(QRS_params *params) {
-	return 0.125 * params->DATA_PEAKS[params->peakcount] + 0.875 * params->SPKF;
+	return 0.125 * params->DATA_PEAKS[params->peakcount%PEAKC] + 0.875 * params->SPKF;
 }
 
 double THRESHOLD1(QRS_params *params) {
@@ -101,5 +101,5 @@ double THRESHOLD2(QRS_params *params) {
 }
 
 double NPKF(QRS_params *params) {
-	return 0.125 * params->DATA_PEAKS[params->peakcount] + 0.875 * params->NPKF;
+	return 0.125 * params->DATA_PEAKS[params->peakcount%PEAKC] + 0.875 * params->NPKF;
 }

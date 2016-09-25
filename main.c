@@ -4,6 +4,7 @@
 #define DERC 1
 #define SQRC 31
 #define MWIC 3
+#define PEAKC 250
 
 #define LOOPCOUNT 10000
 
@@ -15,7 +16,7 @@
 #include <stdio.h>
 
 int main() {
-	QRS_params qrsP = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, RAWC, LOWC, HIGHC, DERC, SQRC, MWIC, 0, 0, 0, 0, 0, 0, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, 0, 0}, *ptr = &qrsP;
+	QRS_params qrsP = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, RAWC, LOWC, HIGHC, DERC, SQRC, MWIC, PEAKC, 0, 0, 0, 0, 0, 0, 0, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, 0, 0}, *ptr = &qrsP;
 
 	// data inits
 	qrsP.RR_LOW = 0;
@@ -45,6 +46,7 @@ int main() {
 		if(qrsP.Index_Sqr == qrsP.SQRCycle){qrsP.Index_Sqr = 0;};
 		qrsP.Index_Mwi++;
 		if(qrsP.Index_Mwi == qrsP.MWICycle){qrsP.Index_Mwi = 0;};
+		if(qrsP.peakcount == qrsP.PeakCyle){qrsP.peakcount = 0;};
 
 		qrsP.DATA_TIMEMS+= 4;	//250 inputs per second = 4 ms / input
 
@@ -65,27 +67,32 @@ int main() {
 			printf("mwi: %i - ", qrsP.DATA_MWI[qrsP.Index_Mwi - 1]);
 			printf("time: %i ", qrsP.DATA_TIMEMS - 4);
 		} else {
-				if (isPeak(ptr, (qrsP.Index_Mwi - 1 + qrsP.MWICycle) % qrsP.MWICycle) == 1) {
-					if (qrsP.DATA_PEAKS[qrsP.peakcount] > qrsP.THRESHOLD1) {
-						if (qrsP.peakcount > 0) {
-							int RRpeak = qrsP.DATA_PEAKSTIME[qrsP.peakcount] - qrsP.DATA_PEAKSTIME[qrsP.LAST_RPEAK];
+				if (isPeak(ptr, (qrsP.Index_Mwi - 1 + qrsP.MWICycle) % qrsP.MWICycle)) {
+					if (qrsP.DATA_PEAKS[qrsP.peakcount%PEAKC] > qrsP.THRESHOLD1) {
+						if (qrsP.peakcount%PEAKC && qrsP.THRESHOLD1) {
+							int RRpeak = qrsP.DATA_PEAKSTIME[qrsP.peakcount%PEAKC] - qrsP.DATA_PEAKSTIME[qrsP.LAST_RPEAK];
 							if (RRpeak > qrsP.RR_LOW-1 && RRpeak < qrsP.RR_HIGH+1) {
-								result(ptr, qrsP.peakcount);
+								result(ptr, qrsP.peakcount%PEAKC);
 							} else {
 								if (RRpeak > qrsP.RR_MISS) {
-									int backwards = qrsP.peakcount;
-									while (backwards >= 0) {
+									int backwards = qrsP.peakcount%PEAKC;
+									while (1) {
 										if (qrsP.DATA_PEAKS[backwards] > qrsP.THRESHOLD2) {
 											result(ptr, backwards);
 											break;
 										} else {
-											backwards--;
+											if (backwards > 0) {
+												backwards--;
+											} else {
+												backwards = PEAKC-1;
+											}
+
 										}
 									}
 								}
 							}
 						} else {
-							CalculateRR(ptr, qrsP.peakcount);
+							CalculateRR(ptr, qrsP.peakcount%PEAKC);
 						}
 						qrsP.peakcount++;
 					} else {

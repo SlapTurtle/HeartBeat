@@ -35,7 +35,6 @@ typedef struct QRS_params
    int Index_Der;
    int Index_Sqr;
    int Index_Mwi;
-   int Index_Peak;
    int DATA_RAW[RAWC];
    int DATA_LOW[LOWC];
    int DATA_HIGH[HIGHC];

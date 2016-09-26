@@ -45,11 +45,12 @@ typedef struct QRS_params
    int DATA_PEAKSTIME[PEAKC];
    int DATA_TIMEMS;
    int peakcount;
+   int RRmissed;
    
 } QRS_params;
 
 void peakDetection(QRS_params *params);
-void result(QRS_params *params, int c);
+void result(QRS_params *params, int c, int missedWarning);
 int isPeak(QRS_params *params, int index);
 double SPKF(QRS_params *params);
 double NPKF(QRS_params *params);

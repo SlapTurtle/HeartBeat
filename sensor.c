@@ -1,9 +1,12 @@
 #include "sensor.h"
+#include "limits.h"
 
 int getNextData(FILE *file) {
 	int input;
-	fscanf(file, "%i", &input);
-	return input;
+	if(fscanf(file, "%i", &input) != EOF){
+		return input;
+	}
+	return INT_MAX; //potential failure due to input being equal to INT_MAX
 }
 
 FILE* openFile(const char* filename) {

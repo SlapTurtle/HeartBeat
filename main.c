@@ -37,8 +37,6 @@ int main() {
 		qrsP.DATA_SQR[qrsP.Index_Sqr] = squaringFilter(ptr);
 		qrsP.DATA_MWI[qrsP.Index_Mwi] = MoveWindowsIntegration(ptr);
 
-		//printf("%i\n", qrsP.DATA_MWI[qrsP.Index_Mwi]);
-
 		// QRS algorithm
 		peakDetection(ptr);
 

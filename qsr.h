@@ -53,12 +53,16 @@ typedef struct QRS_params
 } QRS_params;
 
 void peakDetection(QRS_params *params);
+void setValues1(QRS_params *params, int c);
+void setValues2(QRS_params *params, int c, int missedWarning);
+void output(QRS_params *params, int c, int missedWarning);
 void result(QRS_params *params, int c, int missedWarning);
 int isPeak(QRS_params *params, int index);
-double SPKF(QRS_params *params);
-double NPKF(QRS_params *params);
+double SPKF(QRS_params *params, int c);
+double NPKF(QRS_params *params, int c);
 double THRESHOLD1(QRS_params *params);
 double THRESHOLD2(QRS_params *params);
 void CalculateRR(QRS_params *params, int c);
+char *appendSpaces(char in[], int max);
 
 #endif //QSR_H

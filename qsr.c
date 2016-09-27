@@ -10,7 +10,7 @@ void peakDetection(QRS_params *qrsP) {
 		if (qrsP->DATA_PEAKS[qrsP->peakcount%PEAKC] > qrsP->THRESHOLD1) {
 			if (qrsP->peakcount%PEAKC && qrsP->THRESHOLD1) {
 				int RRpeak = qrsP->DATA_PEAKSTIME[qrsP->peakcount%PEAKC] - qrsP->DATA_PEAKSTIME[qrsP->LAST_RPEAK];
-				printf("RRpeak: %i, RR_LOW: %f, RR_HIGH: %f \n", RRpeak, qrsP->RR_LOW, qrsP->RR_HIGH);
+				//printf("RRpeak: %i, RR_LOW: %f, RR_HIGH: %f \n", RRpeak, qrsP->RR_LOW, qrsP->RR_HIGH);
 				if (RRpeak > qrsP->RR_LOW-1 && RRpeak < qrsP->RR_HIGH+1) {
 					qrsP->RRmissed = 0;
 					result(qrsP, qrsP->peakcount%PEAKC, 0);
@@ -112,8 +112,8 @@ void CalculateRR(QRS_params *params, int c) {
 
 	params->SPKF = SPKF(params);
 
-	params->THRESHOLD1 = params->NPKF + 0.25 * (params->SPKF - params->NPKF);
-	params->THRESHOLD2 = 0.5 * params->THRESHOLD1;
+	params->THRESHOLD1 = THRESHOLD1(params);
+	params->THRESHOLD2 = THRESHOLD2(params);
 
 }
 
@@ -153,12 +153,14 @@ void result(QRS_params *params, int c, int missedWarning) {
 		RRwarning = "[Warning: Pulse Stutter]";
 	}
 
+	printf("%i\n", params->THRESHOLD2);
+
 	if (pulse < 300) { // The decision to disregard certain peaks is clarified in the report
-		char pval[5], tim[5], hrat[5];
+		/*char pval[5], tim[5], hrat[5];
 		sprintf(pval, "%i", peakValue);
 		sprintf(tim, "%.2f", (time / 1000.0));
 		sprintf(hrat, "%.1f", pulse);
-		printf("Peak Value: %s | Time: %s s | Heartrate: %s bpm | %s %s \n", appendSpaces(pval, 4), appendSpaces(tim, 5), appendSpaces(hrat, 5), PVwarning, RRwarning);
+		printf("Peak Value: %s | Time: %s s | Heartrate: %s bpm | %s %s \n", appendSpaces(pval, 4), appendSpaces(tim, 5), appendSpaces(hrat, 5), PVwarning, RRwarning);*/
 		params->LAST_RPEAK = params->peakcount%PEAKC;
 	}
 }

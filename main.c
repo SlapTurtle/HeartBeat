@@ -4,6 +4,7 @@
 #define DERC 1
 #define SQRC 31
 #define MWIC 3
+#define RPEAKC 8
 #define PEAKC 250
 
 #define DEBUGMODE 1
@@ -15,11 +16,11 @@
 #include <stdio.h>
 
 int main() {
-	QRS_params qrsP = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, RAWC, LOWC, HIGHC, DERC, SQRC, MWIC, PEAKC, 0, 0, 0, 0, 0, 0, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, 0, 0, 0}, *ptr = &qrsP;
+	QRS_params qrsP = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, RAWC, LOWC, HIGHC, DERC, SQRC, MWIC, RPEAKC, PEAKC, 0, 0, 0, 0, 0, 0, 0, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},0, 0, 0}, *ptr = &qrsP;
 
 	// Data initialization
 	qrsP.RR_LOW = 0;
-	qrsP.RR_HIGH = 300;
+	qrsP.RR_HIGH = 2000;
 
 	// Opening data file
     FILE *file = openFile("ECG.txt");
@@ -35,6 +36,8 @@ int main() {
 		qrsP.DATA_DER[qrsP.Index_Der] = derivativeFilter(ptr);
 		qrsP.DATA_SQR[qrsP.Index_Sqr] = squaringFilter(ptr);
 		qrsP.DATA_MWI[qrsP.Index_Mwi] = MoveWindowsIntegration(ptr);
+
+		//printf("%i\n", qrsP.DATA_MWI[qrsP.Index_Mwi]);
 
 		// QRS algorithm
 		peakDetection(ptr);

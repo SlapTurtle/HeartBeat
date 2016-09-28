@@ -1,26 +1,23 @@
-#define RAWC 13
-#define LOWC 33
-#define HIGHC 5
-#define DERC 1
-#define SQRC 31
-#define MWIC 3
-#define RPEAKC 8
-#define PEAKC 250
-
-#define DEBUGMODE 1
+#define TIMER 1
 
 #include "sensor.h"
 #include "filters.h"
 #include "qsr.h"
-#include "limits.h"
+#include <limits.h>
 #include <stdio.h>
+#include <time.h>
 
 int main() {
-	QRS_params qrsP = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, RAWC, LOWC, HIGHC, DERC, SQRC, MWIC, RPEAKC, PEAKC, 0, 0, 0, 0, 0, 0, 0, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},0, 0, 0}, *ptr = &qrsP;
+	//Time Measurement
+	clock_t start, end;
+	int clocks;
+	double cpu_time_speed;
+	if(TIMER){
+		start = clock();
+	}
 
-	// Data initialization
-	qrsP.RR_LOW = 0;
-	qrsP.RR_HIGH = 2000;
+	//Creates struct
+	QRS_params qrsP = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, RAWC, LOWC, HIGHC, DERC, SQRC, MWIC, RPEAKC, PEAKC, 0, 0, 0, 0, 0, 0, 0, 0, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, 0, 0, 0, 0}, *ptr = &qrsP;
 
 	// Opening data file
     FILE *file = openFile("ECG.txt");
@@ -56,6 +53,16 @@ int main() {
 	}
 
  	closeFile(file);
+
+ 	//Time Measurement
+	if(TIMER){
+		end = clock();
+
+		clocks = (int) (end-start);
+		cpu_time_speed = (double) clocks / CLOCKS_PER_SEC;
+
+		printf("Clocks: %i | cpu_time: %f", clocks, cpu_time_speed);
+	}
 
     return 1;
 }

@@ -4,8 +4,8 @@
 #define DERC 1
 #define SQRC 31
 #define MWIC 3
+#define RPEAKC 8
 #define PEAKC 250
-#define RR 8
 
 #ifndef QSR_H
 #define QSR_H
@@ -37,6 +37,7 @@ typedef struct QRS_params
    int Index_Sqr;
    int Index_Mwi;
    int Index_RPeak;
+   int Index_RPeak_OK;
    int DATA_RAW[RAWC];
    int DATA_LOW[LOWC];
    int DATA_HIGH[HIGHC];
@@ -45,8 +46,10 @@ typedef struct QRS_params
    int DATA_MWI[MWIC];
    int DATA_PEAKS[PEAKC];
    int DATA_PEAKSTIME[PEAKC];
-   int DATA_RPEAKS[RR];
+   int DATA_RPEAKS[PEAKC];
+   int DATA_RPEAKS_OK[PEAKC];
    int DATA_TIMEMS;
+   int dead_timems;
    int peakcount;
    int RRmissed;
    
@@ -54,15 +57,14 @@ typedef struct QRS_params
 
 void peakDetection(QRS_params *params);
 void setValues1(QRS_params *params, int c);
-void setValues2(QRS_params *params, int c, int missedWarning);
-void output(QRS_params *params, int c, int missedWarning);
-void result(QRS_params *params, int c, int missedWarning);
+void setValues2(QRS_params *params, int c);
+void output(QRS_params *params, int c);
 int isPeak(QRS_params *params, int index);
 double SPKF(QRS_params *params, int c);
+double SPKF2(QRS_params *params, int c);
 double NPKF(QRS_params *params, int c);
 double THRESHOLD1(QRS_params *params);
 double THRESHOLD2(QRS_params *params);
-void CalculateRR(QRS_params *params, int c);
 char *appendSpaces(char in[], int max);
 
 #endif //QSR_H

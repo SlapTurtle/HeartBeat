@@ -5,7 +5,6 @@
 
 // Main function for the QRS algorithm
 void peakDetection(QRS_params *qrsP) {
-	int missedWarning = 0;
 	if (isPeak(qrsP, qrsP->Index_Mwi)) {
 		if (qrsP->DATA_PEAKS[qrsP->peakcount%PEAKC] > qrsP->THRESHOLD1) {
 			if (qrsP->THRESHOLD1) {
@@ -15,15 +14,14 @@ void peakDetection(QRS_params *qrsP) {
 
 					qrsP->DATA_RPEAKS[qrsP->Index_RPeak++] = RRpeak;
 					if(qrsP->Index_RPeak == qrsP->RPEAKCycle){ qrsP->Index_RPeak = 0; }
+					qrsP->DATA_RPEAKS_OK[qrsP->Index_RPeak_OK++] = RRpeak;
+					if(qrsP->Index_RPeak_OK == qrsP->RPEAKCycle){ qrsP->Index_RPeak_OK = 0; }
 
 					setValues1(qrsP, qrsP->peakcount);
 
 				} else {
-					qrsP->RRmissed++;
-					if (qrsP->RRmissed >= 5) {
-						missedWarning = 1;
-					}
 					if (RRpeak > qrsP->RR_MISS) {
+
 						int backwards = qrsP->peakcount%PEAKC;
 						while (qrsP->DATA_PEAKS[backwards] < qrsP->THRESHOLD2) {
 							// cannot run indefinitely - will at most run until previous peak was found,
@@ -37,20 +35,26 @@ void peakDetection(QRS_params *qrsP) {
 						qrsP->DATA_RPEAKS[qrsP->Index_RPeak++] = RRpeak;
 						if(qrsP->Index_RPeak == qrsP->RPEAKCycle){ qrsP->Index_RPeak = 0; }
 
-						setValues2(qrsP, backwards, missedWarning);
+						setValues2(qrsP, backwards);
 					}
 				}
 			} else {
 				setValues1(qrsP, qrsP->peakcount);
 			}
 			qrsP->peakcount++;
-			//if(qrsP->peakcount == qrsP->PeakCyle){qrsP->peakcount = 0;};
+			if(qrsP->peakcount == qrsP->PeakCyle){qrsP->peakcount = 0;};
 		} else {
 			qrsP->NPKF = NPKF(qrsP, qrsP->peakcount%PEAKC);
 			qrsP->THRESHOLD1 = THRESHOLD1(qrsP);
 			qrsP->THRESHOLD2 = THRESHOLD2(qrsP);
-			/*printf("NPKF now %.1f\n",qrsP->NPKF);
-			printf("T1 now %.1f\n",qrsP->THRESHOLD1);*/
+
+			//Output missed 5 consecutive rr-intervals
+			if ((qrsP->DATA_TIMEMS - qrsP->DATA_PEAKSTIME[qrsP->LAST_RPEAK]) > qrsP->DATA_RPEAKS[(qrsP->Index_RPeak - 1 + PEAKC) % PEAKC]*5){
+				if(qrsP->DATA_TIMEMS - qrsP->dead_timems > qrsP->DATA_RPEAKS[(qrsP->Index_RPeak - 1 + PEAKC) % PEAKC]){
+					qrsP->dead_timems = qrsP->DATA_TIMEMS;
+					printf("[Warning: No Pulse Detected At %.2f s!]\n", qrsP->DATA_TIMEMS/1000.0);
+				}
+			}
 		}
 	}
 }
@@ -75,15 +79,15 @@ void setValues1(QRS_params *params, int c) {
 	double accum = 0;
 	double count = 0;
 
-	for(int i = 0; i < 8; i++){
-		if(params->DATA_PEAKS[(params->peakcount - i - 1 + PEAKC) % PEAKC]){
-			accum += params->DATA_PEAKSTIME[(params->peakcount - i + PEAKC) % PEAKC] - params->DATA_PEAKSTIME[(params->peakcount - i - 1 + PEAKC) % PEAKC];
+	for(int i = 0; i < PEAKC; i++){
+		if(params->DATA_RPEAKS[i]){
+			accum += params->DATA_RPEAKS[i];
 			count++;
 		}
 	}
-	for(int i = 0; i < 8; i++){
-		if(params->DATA_RPEAKS[(i + RR) % RR]){
-			rr2accum += params->DATA_RPEAKS[(i + RR) % RR];
+	for(int i = 0; i < PEAKC; i++){
+		if(params->DATA_RPEAKS_OK[i]){
+			rr2accum += params->DATA_RPEAKS_OK[i];
 			rr2count++;
 		}
 	}
@@ -103,18 +107,18 @@ void setValues1(QRS_params *params, int c) {
 	params->THRESHOLD1 = THRESHOLD1(params);
 	params->THRESHOLD2 = THRESHOLD2(params);
 
-	output(params, c, 0);
+	output(params, c);
 }
 
-void setValues2(QRS_params *params, int c, int missedWarning) {
-	params->SPKF = SPKF(params, c);
+void setValues2(QRS_params *params, int c) {
+	params->SPKF = SPKF2(params, c);
 
 	double accum = 0;
 	double count = 0;
 
-	for(int i = 0; i < 8; i++){
-		if(params->DATA_PEAKS[(params->peakcount - i - 1 + PEAKC) % PEAKC]){
-			accum += params->DATA_PEAKSTIME[(params->peakcount - i + PEAKC) % PEAKC] - params->DATA_PEAKSTIME[(params->peakcount - i - 1 + PEAKC) % PEAKC];
+	for(int i = 0; i < PEAKC; i++){
+		if(params->DATA_RPEAKS[i]){
+			accum += params->DATA_RPEAKS[i];
 			count++;
 		}
 	}
@@ -130,14 +134,12 @@ void setValues2(QRS_params *params, int c, int missedWarning) {
 	params->THRESHOLD1 = THRESHOLD1(params);
 	params->THRESHOLD2 = THRESHOLD2(params);
 
-	output(params, c, missedWarning);
+	output(params, c);
 }
 
 // Processes the data outputs of the QRS algorithm
 // and translates it to the user of the device
-void output(QRS_params *params, int c, int missedWarning) {
-
-	//printf("AVG1: %.1f  |  AVG2: %.1f  | ", params->RR_AVERAGE1, params->RR_AVERAGE2);
+void output(QRS_params *params, int c) {
 
 	int peakValue = params->DATA_PEAKS[c];
 	double time = params->DATA_PEAKSTIME[c];
@@ -147,12 +149,8 @@ void output(QRS_params *params, int c, int missedWarning) {
 	double pulse = 60/(dur/1000);
 
 	char* PVwarning = "";
-	char* RRwarning = "";
 	if(peakValue < 2000){
 		PVwarning = "[Warning: Low R-Peak!]";
-	}
-	if(missedWarning && (pulse < 80 || pulse > 110)){
-		RRwarning = "[Warning: Pulse Stutter]";
 	}
 
 	if (pulse < 300 && pulse > 0) { // The decision to disregard certain peaks is clarified in the report
@@ -160,10 +158,10 @@ void output(QRS_params *params, int c, int missedWarning) {
 		sprintf(pval, "%i", peakValue);
 		sprintf(tim, "%.2f", (time / 1000.0));
 		sprintf(hrat, "%.1f", pulse);
-		printf("Peak Value: %s | Time: %s s | Heartrate: %s bpm | %s%s \n", appendSpaces(pval, 4), appendSpaces(tim, 5), appendSpaces(hrat, 5), PVwarning, RRwarning);
+		printf("R-Peak Value: %s | Time: %s s | Heartrate: %s bpm | %s \n", appendSpaces(pval, 4), appendSpaces(tim, 5), appendSpaces(hrat, 5), PVwarning);
 	}
 
-	params->LAST_RPEAK = params->peakcount;
+	params->LAST_RPEAK = c;
 }
 
 
@@ -187,6 +185,11 @@ char *appendSpaces(char in[], int max){
 double SPKF(QRS_params *params, int c) {
 	double val = params->DATA_PEAKS[c];
 	return 0.125 * val + 0.875 * params->SPKF;
+}
+
+double SPKF2(QRS_params *params, int c) {
+	double val = params->DATA_PEAKS[c];
+	return 0.25 * val + 0.75 * params->SPKF;
 }
 
 double THRESHOLD1(QRS_params *params) {
